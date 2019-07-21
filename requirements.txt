@@ -1,0 +1,9 @@
+pandas
+selenium
+beautifulsoup4
+html5lib
+langdetect
+pillow
+wordcloud
+matplotlib
+pyspellchecker
