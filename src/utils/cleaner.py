@@ -1,6 +1,8 @@
+import string
+from nltk.tokenize import word_tokenize
+import re
 
 def remove_emojies(string):
-    import re
     emoji_pattern = re.compile("["
                                u"\U0001F600-\U0001F64F"  # emoticons
                                u"\U0001F300-\U0001F5FF"  # symbols & pictographs
@@ -18,21 +20,38 @@ def remove_emojies(string):
     return clean
 
 
-def clean_string(input):
+# Found on https://towardsdatascience.com/how-to-implement-seq2seq-lstm-model-in-keras-shortcutnlp-6f355f3e5639
+def sentence_cleanup(sentence):
 
-    import string, re
+    sentence = re.sub(r"’", "'", sentence)
+    sentence = re.sub(r"i'm", "i am", sentence)
+    sentence = re.sub(r"he's", "he is", sentence)
+    sentence = re.sub(r"she's", "she is", sentence)
+    sentence = re.sub(r"it's", "it is", sentence)
+    sentence = re.sub(r"that's", "that is", sentence)
+    sentence = re.sub(r"what's", "that is", sentence)
+    sentence = re.sub(r"where's", "where is", sentence)
+    sentence = re.sub(r"how's", "how is", sentence)
+    sentence = re.sub(r"\'ll", " will", sentence)
+    sentence = re.sub(r"\'ve", " have", sentence)
+    sentence = re.sub(r"\'re", " are", sentence)
+    sentence = re.sub(r"\'d", " would", sentence)
+    sentence = re.sub(r"\'re", " are", sentence)
+    sentence = re.sub(r"won't", "will not", sentence)
+    sentence = re.sub(r"can't", "cannot", sentence)
+    sentence = re.sub(r"n't", " not", sentence)
+    sentence = re.sub(r"n'", "ng", sentence)
+    sentence = re.sub(r"'bout", "about", sentence)
+    sentence = re.sub(r"'til", "until", sentence)
+    sentence = re.sub(r"[-()\"#/@;:<>{}`+=~|.!?,]", "", sentence)
 
-    clean = str(input)
-    table = str.maketrans({key: None for key in string.punctuation})
-    clean = re.sub(r'(.)\1{3,}', r'\1',clean)
-    clean = clean.translate(table)
-    clean = clean.replace('nan','')
-    clean = clean.strip()
-    clean = clean.lower()
+    tokenized = word_tokenize(sentence)
 
-    clean = remove_emojies(clean)
+    transform = str.maketrans('', '', string.punctuation)
+    stripped = [w.translate(transform) for w in tokenized]
+    words = ' '.join(stripped)
 
-    return clean
+    return words
 
 
 def correct_mispelling(input):
@@ -43,14 +62,33 @@ def correct_mispelling(input):
 
     spell = SpellChecker()
 
-    misspelled = spell.unknown(input.split(' '))
+    misspelled = spell.unknown(spell.split_words(input))
 
     corrected = input
 
     for word in misspelled:
 
-        corrected = corrected.replace(word,spell.correction(word))
+            candidates = spell.candidates(word)
+
+            print(candidates)
+
+            corrected = corrected.replace(' ' + word + ' ', ' ' + spell.correction(word) + ' ')
 
     print(corrected)
 
     return corrected
+
+
+def clean_string(input):
+
+    clean = str(input)
+    clean = re.sub(r'( )\1{2,}', r'\1', clean)
+    clean = re.sub(r'(.)\1{3,}', r'\1',clean)
+    clean = sentence_cleanup(clean)
+    clean = clean.replace('nan','')
+    clean = clean.strip()
+    clean = clean.lower()
+
+    clean = remove_emojies(clean)
+
+    return clean

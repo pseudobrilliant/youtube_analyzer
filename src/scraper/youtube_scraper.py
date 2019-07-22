@@ -32,10 +32,12 @@ def get_content(url, headless=True, pause=4):
 
     content = driver.page_source
 
+    driver.close()
+
     return content
 
 
-def scroll(driver, pause=2, delta=300, failed_attempts=5):
+def scroll(driver, pause=3, delta=300, failed_attempts=5):
     """
     Scroll to the bottom of the automated browser instance using webdriver.
     Depending on number of comments, this may take some time to scroll through to the bottom.

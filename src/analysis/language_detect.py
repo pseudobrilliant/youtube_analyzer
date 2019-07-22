@@ -25,6 +25,7 @@ def detect(comment):
 
     return None
 
+
 lang_dict = {'alpha2': 'English',
              'aa': 'Afar',
              'ab': 'Abkhazian',
